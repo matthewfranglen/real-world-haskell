@@ -4,27 +4,62 @@ myLength :: [a] -> Int
 myLength (x:xs) = 1 + myLength xs
 myLength []     = 0
 
+fLength :: [a] -> Int
+fLength xs = foldr f 0 xs
+    where f v a = a + 1
+
 myNull :: [a] -> Bool
 myNull [] = True
 myNull _  = False
+
+fNull :: [a] -> Bool
+fNull xs = foldr f True xs
+    where f _ _ = False
 
 myHead :: [a] -> a
 myHead (x:xs) = x
 myHead []     = error "Empty list"
 
+fHead :: [a] -> Maybe a
+fHead xs = foldr f Nothing xs
+    where f v _ = Just v
+
 myTail :: [a] -> [a]
 myTail (x:xs) = xs
 myTail []     = error "Empty list"
+
+fTail :: [a] -> Maybe [a]
+fTail xs = xs'
+    where (xs', _)      = foldr f (Nothing, []) xs
+          f x (_, xs'') = (Just xs'', x:xs'')
 
 myLast :: [a] -> a
 myLast (x:[])   = x
 myLast (x:y:xs) = myLast (y:xs)
 myLast []       = error "Empty list"
 
+-- This uses a tuple with a function at the end which initially wraps the value
+-- in Just, but then becomes a function which returns the result of the last
+-- function (which is that first encountered value in a Just)
+fLast :: [a] -> Maybe a
+fLast xs = x
+    where (x, _) = foldr f (Nothing, Just) xs
+          f x (_, g) = (x', \_ -> x')
+            where x' = g x
+
 myInit :: [a] -> [a]
 myInit (x:[])   = []
 myInit (x:y:xs) = (x : myInit (y:xs))
 myInit []       = error "Empty list"
+
+-- Can't seem to find a way that isn't conditional
+fInit :: [a] -> Maybe [a]
+fInit xs = xs'
+    where (xs', _)    = foldr f (Nothing, []) xs
+          f _ (Nothing, _) = (Just [], [])
+          f x (_, xs)      = (Just xs', xs')
+            where xs'      = x:xs
+
 
 makeSafe f [] = Nothing
 makeSafe f xs = Just $ f xs
