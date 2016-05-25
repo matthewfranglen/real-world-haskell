@@ -268,3 +268,13 @@ fGroupBy f xs = xs':xss
           f' x (yss, ys@(y:_)) = if f x y
                              then (yss, x:ys)
                              else (ys:yss, [x])
+
+fAny :: (a -> Bool) -> [a] -> Bool
+fAny f xs = foldr f' False xs
+    where f' x True = True
+          f' x _    = f x
+
+-- This cycles the list by operating over the generated list
+fCycle :: [a] -> [a]
+fCycle xs = foldr f [] [1..]
+    where f _ xs' = xs ++ xs'
