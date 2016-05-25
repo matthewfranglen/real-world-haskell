@@ -255,4 +255,16 @@ asInt xs = let (_, a) = foldr step (1, 0) xs
 fConcat :: [[a]] -> [a]
 fConcat = foldr (++) []
 
-
+-- groupBy splits into equal adjacent elements
+-- currently not quite perfect:
+--    let g a _ = a == 'e'
+--    groupBy g "hello"
+-- this produces ["h", "ello"] when fGroupBy produces ["h","el","l","o"]
+-- I'm not super sure what groupBy is supposed to do so :shrug:
+fGroupBy :: (a -> a -> Bool) -> [a] -> [[a]]
+fGroupBy f xs = xs':xss
+    where (xss, xs') = foldr f' ([], []) xs
+          f' x (yss, []) = (yss, [x])
+          f' x (yss, ys@(y:_)) = if f x y
+                             then (yss, x:ys)
+                             else (ys:yss, [x])
