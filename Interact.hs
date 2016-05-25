@@ -15,7 +15,7 @@ splitLines cs =
 
 isLineTerminator '\r' = True
 isLineTerminator '\n' = True
-isLineTerminator _ = False
+isLineTerminator _    = False
 
 main = mainWith myFunction
     where
