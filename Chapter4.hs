@@ -94,16 +94,12 @@ myOr []         = error "Empty list"
 
 myAll :: (a -> Bool) -> [a] -> Bool
 myAll f (x:[]) = f x
-myAll f (x:xs) = case f x of
-    False -> False
-    True -> myAll f xs
+myAll f (x:xs) = if f x then False else myAll f xs
 myAll f []     = error "Empty list"
 
 myAny :: (a -> Bool) -> [a] -> Bool
 myAny f (x:[]) = f x
-myAny f (x:xs) = case f x of
-    True -> True
-    False -> myAny f xs
+myAny f (x:xs) = if f x then True else myAny f xs
 myAny f []     = error "Empty list"
 
 myTake :: Int -> [a] -> [a]
@@ -125,9 +121,7 @@ mySplit n (x:xs) = do
 mySplit _ []     = ([], [])
 
 myTakeWhile :: (a -> Bool) -> [a] -> [a]
-myTakeWhile f (x:xs) = case f x of
-    True -> (x : myTakeWhile f xs)
-    False -> []
+myTakeWhile f (x:xs) = if f x then x:myTakeWhile f xs else []
 myTakeWhile f [] = []
 
 -- naive approach - the list is traversed from the end so this is the wrong side
@@ -142,17 +136,12 @@ fTakeWhile f xs = foldr f' [] xs
     where f' x xs = if f x then x:xs else []
 
 myDropWhile :: (a -> Bool) -> [a] -> [a]
-myDropWhile f (x:xs) = case f x of
-    True -> myDropWhile f xs
-    False -> (x:xs)
+myDropWhile f (x:xs) = if f x then myDropWhile f xs else x:xs
 myDropWhile f [] = []
 
 myBreak :: (a -> Bool) -> [a] -> ([a], [a])
-myBreak f (x:xs) = case f x of
-    True -> ([],(x:xs))
-    False -> do
-        let (ys, zs) = myBreak f xs
-        ((x:ys), zs)
+myBreak f (x:xs) = if f x then ([],(x:xs)) else ((x:ys), zs)
+    where (ys, zs) = myBreak f xs
 myBreak f [] = ([], [])
 
 mySpan :: (a -> Bool) -> [a] -> ([a], [a])
