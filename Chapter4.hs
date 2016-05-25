@@ -130,6 +130,17 @@ myTakeWhile f (x:xs) = case f x of
     False -> []
 myTakeWhile f [] = []
 
+-- naive approach - the list is traversed from the end so this is the wrong side
+-- fTakeWhile :: (a -> Bool) -> [a] -> [a]
+-- fTakeWhile f xs = f'
+--     where (f', _)         = foldr g ([], True) xs
+--           g x (xs', True) = if f x then (x:xs', True) else (xs', False)
+--           g _ a           = a
+
+fTakeWhile :: (a -> Bool) -> [a] -> [a]
+fTakeWhile f xs = foldr f' [] xs
+    where f' x xs = if f x then x:xs else []
+
 myDropWhile :: (a -> Bool) -> [a] -> [a]
 myDropWhile f (x:xs) = case f x of
     True -> myDropWhile f xs
@@ -236,6 +247,7 @@ asInt xs = let (_, a) = foldr step (1, 0) xs
     where step value (factor, acc) | value == '-' = (factor, -acc)
                                    | otherwise    = (factor * 10, acc + (factor * digitToInt value))
 
--- fConcat :: [[a]] -> [a]
--- fConcat = foldr step []
---     where step a as = a:as
+fConcat :: [[a]] -> [a]
+fConcat = foldr (++) []
+
+
