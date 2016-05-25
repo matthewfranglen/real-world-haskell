@@ -94,12 +94,16 @@ myOr []         = error "Empty list"
 
 myAll :: (a -> Bool) -> [a] -> Bool
 myAll f (x:[]) = f x
-myAll f (x:xs) = if f x then False else myAll f xs
+myAll f (x:xs) = if f x
+                 then False
+                 else myAll f xs
 myAll f []     = error "Empty list"
 
 myAny :: (a -> Bool) -> [a] -> Bool
 myAny f (x:[]) = f x
-myAny f (x:xs) = if f x then True else myAny f xs
+myAny f (x:xs) = if f x
+                 then True
+                 else myAny f xs
 myAny f []     = error "Empty list"
 
 myTake :: Int -> [a] -> [a]
@@ -121,7 +125,9 @@ mySplit n (x:xs) = do
 mySplit _ []     = ([], [])
 
 myTakeWhile :: (a -> Bool) -> [a] -> [a]
-myTakeWhile f (x:xs) = if f x then x:myTakeWhile f xs else []
+myTakeWhile f (x:xs) = if f x
+                       then x:myTakeWhile f xs
+                       else []
 myTakeWhile f [] = []
 
 -- naive approach - the list is traversed from the end so this is the wrong side
@@ -133,14 +139,20 @@ myTakeWhile f [] = []
 
 fTakeWhile :: (a -> Bool) -> [a] -> [a]
 fTakeWhile f xs = foldr f' [] xs
-    where f' x xs = if f x then x:xs else []
+    where f' x xs = if f x
+                    then x:xs
+                    else []
 
 myDropWhile :: (a -> Bool) -> [a] -> [a]
-myDropWhile f (x:xs) = if f x then myDropWhile f xs else x:xs
+myDropWhile f (x:xs) = if f x
+                       then myDropWhile f xs
+                       else x:xs
 myDropWhile f [] = []
 
 myBreak :: (a -> Bool) -> [a] -> ([a], [a])
-myBreak f (x:xs) = if f x then ([],(x:xs)) else ((x:ys), zs)
+myBreak f (x:xs) = if f x
+                   then ([],(x:xs))
+                   else ((x:ys), zs)
     where (ys, zs) = myBreak f xs
 myBreak f [] = ([], [])
 
@@ -148,14 +160,18 @@ mySpan :: (a -> Bool) -> [a] -> ([a], [a])
 mySpan f xs = myBreak (\a -> not $ f a) xs
 
 myElem :: (Eq a) => a -> [a] -> Bool
-myElem a (x:xs) = if a == x then True else myElem a xs
+myElem a (x:xs) = if a == x
+                  then True
+                  else myElem a xs
 myElem _ [] = False
 
 myNotElem :: (Eq a) => a -> [a] -> Bool
 myNotElem a xs = not $ myElem a xs
 
 myFilter :: (a -> Bool) -> [a] -> [a]
-myFilter f (x:xs) = if f x then (x : myFilter f xs) else myFilter f xs
+myFilter f (x:xs) = if f x
+                    then (x : myFilter f xs)
+                    else myFilter f xs
 myFilter f [] = []
 
 myIsPrefixOf :: (Eq a) => [a] -> [a] -> Bool
