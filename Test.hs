@@ -1,24 +1,30 @@
 import Data.Char (digitToInt)
 
-myLength [] = 0
+myLength :: [a] -> Int
 myLength (x:xs) = 1 + myLength xs
+myLength []     = 0
 
+myNull :: [a] -> Bool
 myNull [] = True
-myNull _ = False
+myNull _  = False
 
+myHead :: [a] -> a
 myHead (x:xs) = x
-myHead [] = error "Empty list"
+myHead []     = error "Empty list"
 
+myTail :: [a] -> [a]
 myTail (x:xs) = xs
-myTail [] = error "Empty list"
+myTail []     = error "Empty list"
 
+myLast :: [a] -> a
+myLast (x:[])   = x
 myLast (x:y:xs) = myLast (y:xs)
-myLast (x:[]) = x
-myLast [] = error "Empty list"
+myLast []       = error "Empty list"
 
+myInit :: [a] -> [a]
+myInit (x:[])   = []
 myInit (x:y:xs) = (x : myInit (y:xs))
-myInit (x:[]) = []
-myInit [] = error "Empty list"
+myInit []       = error "Empty list"
 
 makeSafe f [] = Nothing
 makeSafe f xs = Just $ f xs
@@ -28,52 +34,52 @@ makeSafe f xs = Just $ f xs
 myAppend :: [a] -> [a] -> [a]
 myAppend (x:xs) ys = (x : myAppend xs ys)
 myAppend [] (y:ys) = (y : myAppend [] ys)
-myAppend [] [] = []
+myAppend [] []     = []
 
 myConcat :: [[a]] -> [a]
 myConcat ((x:xs):xss) = (x : myConcat (xs:xss))
-myConcat ([]:xss) = myConcat xss
-myConcat [] = []
+myConcat ([]:xss)     = myConcat xss
+myConcat []           = []
 
 myReverse :: [a] -> [a]
 myReverse (x:xs) = (myReverse xs) ++ [x]
-myReverse [] = []
+myReverse []     = []
 
 myAnd :: [Bool] -> Bool
 myAnd (False:xs) = False
-myAnd (True:[]) = True
-myAnd (True:xs) = myAnd xs
-myAnd [] = error "Empty list"
+myAnd (True:[])  = True
+myAnd (True:xs)  = myAnd xs
+myAnd []         = error "Empty list"
 
 myOr :: [Bool] -> Bool
-myOr (True:xs) = True
+myOr (True:xs)  = True
 myOr (False:[]) = False
 myOr (False:xs) = myOr xs
-myOr [] = error "Empty list"
+myOr []         = error "Empty list"
 
 myAll :: (a -> Bool) -> [a] -> Bool
 myAll f (x:[]) = f x
 myAll f (x:xs) = case f x of
     False -> False
     True -> myAll f xs
-myAll f [] = error "Empty list"
+myAll f []     = error "Empty list"
 
 myAny :: (a -> Bool) -> [a] -> Bool
 myAny f (x:[]) = f x
 myAny f (x:xs) = case f x of
     True -> True
     False -> myAny f xs
-myAny f [] = error "Empty list"
+myAny f []     = error "Empty list"
 
 myTake :: Int -> [a] -> [a]
-myTake 0 _ = []
+myTake 0 _      = []
 myTake n (x:xs) = (x : myTake (n - 1) xs)
-myTake _ [] = []
+myTake _ []     = []
 
 myDrop :: Int -> [a] -> [a]
-myDrop 0 xs = xs
+myDrop 0 xs     = xs
 myDrop n (x:xs) = myDrop (n - 1) xs
-myDrop _ [] = []
+myDrop _ []     = []
 
 mySplit :: Int -> [a] -> ([a], [a])
 mySplit n (x:xs) = do
@@ -81,7 +87,7 @@ mySplit n (x:xs) = do
     if n > 0
     then ((x:ys), zs)
     else (ys, (x:zs))
-mySplit _ [] = ([], [])
+mySplit _ []     = ([], [])
 
 myTakeWhile :: (a -> Bool) -> [a] -> [a]
 myTakeWhile f (x:xs) = case f x of
@@ -118,10 +124,10 @@ myFilter f (x:xs) = if f x then (x : myFilter f xs) else myFilter f xs
 myFilter f [] = []
 
 myIsPrefixOf :: (Eq a) => [a] -> [a] -> Bool
-myIsPrefixOf [] _ = True
 myIsPrefixOf (x:xs) (y:ys)
-    | x == y    = myIsPrefixOf xs ys
-myIsPrefixOf _ _ = False
+    | x == y      = myIsPrefixOf xs ys
+myIsPrefixOf [] _ = True
+myIsPrefixOf _ _  = False
 
 myIsInfixOf :: (Eq a) => [a] -> [a] -> Bool
 myIsInfixOf [] _ = True
@@ -195,6 +201,6 @@ asInt xs = let (_, a) = foldr step (1, 0) xs
     where step value (factor, acc) | value == '-' = (factor, -acc)
                                    | otherwise    = (factor * 10, acc + (factor * digitToInt value))
 
-fConcat :: [[a]] -> [a]
-fConcat = foldr step []
-    where step a as = a:as
+-- fConcat :: [[a]] -> [a]
+-- fConcat = foldr step []
+--     where step a as = a:as
