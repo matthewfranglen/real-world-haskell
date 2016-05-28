@@ -1,4 +1,5 @@
 import Data.Char (digitToInt)
+import Data.List (foldl')
 
 myLength :: [a] -> Int
 myLength (x:xs) = 1 + myLength xs
@@ -274,10 +275,19 @@ fAny f xs = foldr f' False xs
     where f' x True = True
           f' x _    = f x
 
+fAnyL :: (a -> Bool) -> [a] -> Bool
+fAnyL f xs = foldl' f' False xs
+    where f' True x = True
+          f' _ x    = f x
+
 -- This cycles the list by operating over the generated list
 fCycle :: [a] -> [a]
 fCycle xs = foldr f [] [1..]
     where f _ xs' = xs ++ xs'
+
+-- This causes an infinite loop, even when converted to foldl
+-- fCycleL xs = foldl' f [] [1..]
+--     where f xs' _ = xs ++ xs'
 
 fWords :: [Char] -> [[Char]]
 fWords xs = if null xs' then xss else xs':xss
