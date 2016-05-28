@@ -278,3 +278,9 @@ fAny f xs = foldr f' False xs
 fCycle :: [a] -> [a]
 fCycle xs = foldr f [] [1..]
     where f _ xs' = xs ++ xs'
+
+fWords :: [Char] -> [[Char]]
+fWords xs = if null xs' then xss else xs':xss
+    where (xss, xs') = foldr f ([], []) xs
+          f x (yss, []) = if isNewLine x then (yss, []) else (yss, [x])
+          f x (yss, ys) = if isNewLine x then (ys:yss, []) else (yss, x:ys)
