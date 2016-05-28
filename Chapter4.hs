@@ -295,6 +295,13 @@ fWords xs = if null xs' then xss else xs':xss
           f x (yss, []) = if isNewLine x then (yss, []) else (yss, [x])
           f x (yss, ys) = if isNewLine x then (ys:yss, []) else (yss, x:ys)
 
+-- This continually appends to the end of the list and is thus far less efficient than the foldr version
+fWordsL :: [Char] -> [[Char]]
+fWordsL xs = if null xs' then xss else xss ++ [xs']
+    where (xss, xs') = foldl' f ([], []) xs
+          f (yss, []) x = if isNewLine x then (yss, []) else (yss, [x])
+          f (yss, ys) x = if isNewLine x then (yss ++ [ys], []) else (yss, ys ++ [x])
+
 fUnlines :: [[Char]] -> [Char]
 fUnlines xss = foldr f "" xss
     where f x xs = x ++ "\n" ++ xs
