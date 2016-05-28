@@ -305,3 +305,7 @@ fWordsL xs = if null xs' then xss else xss ++ [xs']
 fUnlines :: [[Char]] -> [Char]
 fUnlines xss = foldr f "" xss
     where f x xs = x ++ "\n" ++ xs
+
+fUnlinesL :: [[Char]] -> [Char]
+fUnlinesL xss = foldl' f "" xss
+    where f xs x = xs ++ x ++ "\n"
