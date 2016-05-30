@@ -2,6 +2,7 @@ module PrettyJSON where
 
 import Numeric
 import Data.Bits
+import Prettify
 
 renderJValue :: JValue -> Doc
 renderJValue (JBool True)  = text "true"
