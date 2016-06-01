@@ -5,7 +5,7 @@ import Data.Char (ord)
 import Data.Bits (shiftR, (.&.))
 
 import SimpleJSON (JValue(..))
-import Prettify (Doc, (<>), char, double, fsep, hcat, punctuate, text, compact, pretty)
+import Prettify (Doc, (<>), (</>), char, double, fsep, hcat, punctuate, text, compact, pretty)
 
 renderJValue :: JValue -> Doc
 renderJValue (JBool True)  = text "true"
@@ -24,6 +24,9 @@ string = enclose '"' '"' . hcat . map oneChar
 
 enclose :: Char -> Char -> Doc -> Doc
 enclose left right x = char left <> x <> char right
+
+wrap :: Char -> Char -> Doc -> Doc
+wrap left right x = char left </> x </> char right
 
 oneChar :: Char -> Doc
 oneChar c = case lookup c simpleEscapes of
@@ -53,5 +56,5 @@ hexEscape c | d < 0x10000 = smallHex d
   where d = ord c
 
 series :: Char -> Char -> (a -> Doc) -> [a] -> Doc
-series open close item = enclose open close
+series open close item = wrap open close
                        . fsep . punctuate (char ',') . map item
