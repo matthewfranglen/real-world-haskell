@@ -41,6 +41,8 @@ fsep :: [Doc] -> Doc
 fsep = fold (</>)
 
 (</>) :: Doc -> Doc -> Doc
+x </> Empty = x
+Empty </> y = y
 x </> y = x <> softline <> y
 
 softline :: Doc
