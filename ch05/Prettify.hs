@@ -8,6 +8,7 @@ data Doc = Empty
          | Line
          | Concat Doc Doc
          | Union Doc Doc
+         | Indent Doc
            deriving (Show,Eq)
 
 empty :: Doc
@@ -25,6 +26,9 @@ double d = text (show d)
 
 line :: Doc
 line = Line
+
+indent :: Doc -> Doc
+indent d = Indent d
 
 (<>) :: Doc -> Doc -> Doc
 Empty <> y = y
@@ -71,21 +75,24 @@ compact x = transform [x]
                 Char c       -> c : transform ds
                 Text s       -> s ++ transform ds
                 Line         -> '\n' : transform ds
+                Indent d     -> transform [d] ++ transform ds
                 a `Concat` b -> transform (a:b:ds)
                 _ `Union` b  -> transform (b:ds)
 
 pretty :: Int -> Doc -> String
-pretty width x = best 0 [x]
-    where best col (d:ds) =
+pretty width x = best 0 0 [x]
+    where best col nest (d:ds) =
               case d of
-                Empty        -> best col ds
-                Char c       -> c :  best (col + 1) ds
-                Text s       -> s ++ best (col + length s) ds
-                Line         -> '\n' : best 0 ds
-                a `Concat` b -> best col (a:b:ds)
-                a `Union` b  -> nicest col (best col (a:ds))
-                                           (best col (b:ds))
-          best _ _ = ""
+                Empty        -> best col nest ds
+                Char c       -> c :  best (col + 1) nest ds
+                Text s       -> s ++ best (col + length s) nest ds
+                Line         -> '\n' : best 0 nest ds
+                Indent d     -> best col (nest + 1) (fill indent d : ds)
+                    where indent = (nest + 1) * 2
+                a `Concat` b -> best col nest (a:b:ds)
+                a `Union` b  -> nicest col (best col nest (a:ds))
+                                           (best col nest (b:ds))
+          best _ _ _ = ""
 
           nicest col a b | (width - least) `fits` a = a
                          | otherwise                = b
@@ -96,3 +103,7 @@ w `fits` _ | w < 0 = False
 w `fits` ""        = True
 w `fits` ('\n':_)  = True
 w `fits` (c:cs)    = (w - 1) `fits` cs
+
+fill :: Int -> Doc -> Doc
+fill 0 d = d
+fill x d = Text (replicate x ' ') <> d
