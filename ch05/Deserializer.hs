@@ -11,7 +11,9 @@ deserialize :: String -> JValue
 deserialize = parse . tokenize
 
 parse :: [Token] -> JValue
-parse xs = undefined
+parse []            = error "No token"
+parse [(TString s)] = JString s
+parse [(TNumber n)] = undefined
 
 data Token = TOpenArray
            | TCloseArray
@@ -26,28 +28,35 @@ data Token = TOpenArray
              deriving (Show)
 
 tokenize :: String -> [Token]
-tokenize []        = []
-tokenize ('[':xs)  = TOpenArray : tokenize xs
-tokenize (']':xs)  = TCloseArray : tokenize xs
-tokenize ('{':xs)  = TOpenObject : tokenize xs
-tokenize ('}':xs)  = TCloseObject : tokenize xs
-tokenize (':':xs)  = TKeyValueSeparator : tokenize xs
-tokenize (',':xs)  = TElementSeparator : tokenize xs
-tokenize ('"':xs)  = s "" xs
-    where s _ []              = error "Parse error: Premature end inside string"
-          s xs' ('"':xs)      = TString (decode xs') : tokenize xs
-          s xs' ('\\':'"':xs) = s (xs' ++ "\"") xs
-          s xs' (x:xs)        = s (xs' ++ [x]) xs
+tokenize []                       = []
+tokenize ('[':xs)                 = TOpenArray : tokenize xs
+tokenize (']':xs)                 = TCloseArray : tokenize xs
+tokenize ('{':xs)                 = TOpenObject : tokenize xs
+tokenize ('}':xs)                 = TCloseObject : tokenize xs
+tokenize (':':xs)                 = TKeyValueSeparator : tokenize xs
+tokenize (',':xs)                 = TElementSeparator : tokenize xs
+tokenize ('"':xs)                 = tokenizeString "" xs
+tokenize ('t':'r':'u':'e':xs)     = TBool True : tokenize xs
+tokenize ('f':'a':'l':'s':'e':xs) = TBool False : tokenize xs
+tokenize ('n':'u':'l':'l':xs)     = TNull : tokenize xs
+tokenize (x:xs)                   | isSpace x              = tokenize xs
+                                  | isNumber x || x == '-' = tokenizeNumber [] (x:xs)
 
-tokenize (x:xs) | isSpace x              = tokenize xs
-                | isNumber x || x == '-' = n [] (x:xs)
-    where n xs' []                              = [TString xs']
-          n xs' (x:xs) | isNumber x || x == '-' = n (xs' ++ [x]) xs
-                       | x == '.'               = fn (xs' ++ [x]) xs
-                       | otherwise              = TString xs' : tokenize (x:xs)
-          fn xs' []                  = [TString xs']
-          fn xs' (x:xs) | isNumber x = fn (xs' ++ [x]) xs
-                        | otherwise  = TString xs' : tokenize (x:xs)
+tokenizeString :: String -> String -> [Token]
+tokenizeString _ []              = error "Parse error: Premature end inside string"
+tokenizeString xs' ('"':xs)      = TString (decode xs') : tokenize xs
+tokenizeString xs' ('\\':'"':xs) = tokenizeString (xs' ++ "\"") xs
+tokenizeString xs' (x:xs)        = tokenizeString (xs' ++ [x]) xs
+
+tokenizeNumber :: String -> String -> [Token]
+tokenizeNumber xs' []                              = [TNumber xs']
+tokenizeNumber xs' (x:xs) | isNumber x || x == '-' = tokenizeNumber (xs' ++ [x]) xs
+                          | x == '.'               = tokenizeFractionalNumber (xs' ++ [x]) xs
+                          | otherwise              = TNumber xs' : tokenize (x:xs)
+
+tokenizeFractionalNumber xs' []                  = [TNumber xs']
+tokenizeFractionalNumber xs' (x:xs) | isNumber x = tokenizeFractionalNumber (xs' ++ [x]) xs
+                                    | otherwise  = TNumber xs' : tokenize (x:xs)
 
 decode :: String -> String
 decode xs = xs
