@@ -75,10 +75,11 @@ tokenize (x:xs)                   | isSpace x              = tokenize xs
                                   | isNumber x || x == '-' = tokenizeNumber [] (x:xs)
 
 tokenizeString :: String -> String -> [Token]
-tokenizeString _ []              = error "Parse error: Premature end inside string"
-tokenizeString xs' ('"':xs)      = TString (decode xs') : tokenize xs
-tokenizeString xs' ('\\':'"':xs) = tokenizeString (xs' ++ "\"") xs
-tokenizeString xs' (x:xs)        = tokenizeString (xs' ++ [x]) xs
+tokenizeString _ []               = error "Parse error: Premature end inside string"
+tokenizeString xs' ('"':xs)       = TString (decode xs') : tokenize xs
+tokenizeString xs' ('\\':'\\':xs) = tokenizeString (xs' ++ "\\") xs
+tokenizeString xs' ('\\':'"':xs)  = tokenizeString (xs' ++ "\"") xs
+tokenizeString xs' (x:xs)         = tokenizeString (xs' ++ [x]) xs
 
 tokenizeNumber :: String -> String -> [Token]
 tokenizeNumber xs' []                              = [TNumber xs']
