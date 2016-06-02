@@ -42,6 +42,7 @@ data Token = TString String
            | TIndent
            | TUnindent
            | TBreak
+             deriving (Show)
 
 series :: [[Token]] -> [Token]
 series []     = []
