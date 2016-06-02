@@ -4,6 +4,7 @@ module Deserializer
     ) where
 
 import Data.Char (isSpace, isNumber)
+import Text.Read (readMaybe)
 
 import SimpleJSON (JValue(..))
 
@@ -13,7 +14,11 @@ deserialize = parse . tokenize
 parse :: [Token] -> JValue
 parse []            = error "No token"
 parse [(TString s)] = JString s
-parse [(TNumber n)] = undefined
+parse [(TNumber n)] = case readMaybe n :: Maybe Double of
+    Just d -> JNumber d
+    _      -> error "Unparseable number"
+parse [(TBool x)] = JBool x
+parse [TNull]     = JNull
 
 data Token = TOpenArray
            | TCloseArray
