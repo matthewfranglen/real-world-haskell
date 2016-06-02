@@ -14,18 +14,20 @@ deserialize = parse . tokenize
 parse :: [Token] -> JValue
 parse xs | null xs'  = o
          | otherwise = error "Tokens continue past end of object"
-    where (o, xs') = parseObject xs
+    where (o, xs') = parseValue xs
 
-parseObject :: [Token] -> (JValue, [Token])
-parseObject []               = error "Parse error: No token"
-parseObject ((TString s):xs) = (JString s, xs)
-parseObject ((TNumber n):xs) = case readMaybe n :: Maybe Double of
+parseValue :: [Token] -> (JValue, [Token])
+parseValue []               = error "Parse error: No token"
+parseValue ((TString s):xs) = (JString s, xs)
+parseValue ((TNumber n):xs) = case readMaybe n :: Maybe Double of
     Just d -> (JNumber d, xs)
     _      -> error "Parse error: Unparseable number"
-parseObject ((TBool x):xs) = (JBool x, xs)
-parseObject (TNull:xs)     = (JNull, xs)
+parseValue ((TBool x):xs) = (JBool x, xs)
+parseValue (TNull:xs)     = (JNull, xs)
 
-parseObject (TOpenArray:xs) = parseArray [] xs
+parseValue (TOpenArray:xs) = parseArray [] xs
+
+parseValue (TOpenObject:xs) = parseObject [] xs
 
 parseArray :: [JValue] -> [Token] -> (JValue, [Token])
 parseArray xs' []               = error "Parse error: Premature end inside string"
@@ -33,8 +35,17 @@ parseArray xs' (TCloseArray:xs) = (JArray xs', xs)
 parseArray xs' xs | g == TElementSeparator = parseArray xs'' gs
                   | g == TCloseArray       = ((JArray xs''), gs)
                   | otherwise              = error "Parse error: No separator inside array"
-    where (x, (g:gs)) = parseObject xs
+    where (x, (g:gs)) = parseValue xs
           xs''        = xs' ++ [x]
+
+parseObject :: [(String, JValue)] -> [Token] -> (JValue, [Token])
+parseObject xs' [] = error "Parse error: Premature end inside object"
+parseObject xs' (TCloseObject:xs) = (JObject xs', xs)
+parseObject xs' ((TString k):TKeyValueSeparator:xs) | g == TElementSeparator = parseObject xs'' gs
+                                                    | g == TCloseObject      = ((JObject xs''), gs)
+                                                    | otherwise              = error "Parse error: No separator inside object"
+    where (x, (g:gs)) = parseValue xs
+          xs''        = xs' ++ [(k, x)]
 
 data Token = TOpenArray
            | TCloseArray
