@@ -12,13 +12,29 @@ deserialize :: String -> JValue
 deserialize = parse . tokenize
 
 parse :: [Token] -> JValue
-parse []            = error "No token"
-parse [(TString s)] = JString s
-parse [(TNumber n)] = case readMaybe n :: Maybe Double of
-    Just d -> JNumber d
-    _      -> error "Unparseable number"
-parse [(TBool x)] = JBool x
-parse [TNull]     = JNull
+parse xs | null xs'  = o
+         | otherwise = error "Tokens continue past end of object"
+    where (o, xs') = parseObject xs
+
+parseObject :: [Token] -> (JValue, [Token])
+parseObject []               = error "Parse error: No token"
+parseObject ((TString s):xs) = (JString s, xs)
+parseObject ((TNumber n):xs) = case readMaybe n :: Maybe Double of
+    Just d -> (JNumber d, xs)
+    _      -> error "Parse error: Unparseable number"
+parseObject ((TBool x):xs) = (JBool x, xs)
+parseObject (TNull:xs)     = (JNull, xs)
+
+parseObject (TOpenArray:xs) = parseArray [] xs
+
+parseArray :: [JValue] -> [Token] -> (JValue, [Token])
+parseArray xs' []               = error "Parse error: Premature end inside string"
+parseArray xs' (TCloseArray:xs) = (JArray xs', xs)
+parseArray xs' xs | g == TElementSeparator = parseArray xs'' gs
+                  | g == TCloseArray       = ((JArray xs''), gs)
+                  | otherwise              = error "Parse error: No separator inside array"
+    where (x, (g:gs)) = parseObject xs
+          xs''        = xs' ++ [x]
 
 data Token = TOpenArray
            | TCloseArray
@@ -30,7 +46,7 @@ data Token = TOpenArray
            | TNumber String
            | TBool Bool
            | TNull
-             deriving (Show)
+             deriving (Show, Eq)
 
 tokenize :: String -> [Token]
 tokenize []                       = []
