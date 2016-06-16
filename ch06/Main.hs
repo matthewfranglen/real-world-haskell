@@ -15,12 +15,15 @@ secondDemo :: (b -> c) -> (a, b) -> (a, c)
 secondDemo f = second f
 
 -- Other examples
+-- This takes nothing and is a calling example really
 secondDemo2 :: (Integer, Integer)
 secondDemo2 = second (\ 1 -> 2) (1, 1)
 
+-- when called with `(1, 1)` it returns `(1, Just 1)`
 secondDemo3 :: (a, b) -> (a, Maybe b)
 secondDemo3 = second Just
 
+-- when called with `(1, Just 1)` it returns `(1, Just 2)`
 secondDemo4 :: Num b => (a, Maybe b) -> (a, Maybe b)
 secondDemo4 = second $ fmap (+1)
 
