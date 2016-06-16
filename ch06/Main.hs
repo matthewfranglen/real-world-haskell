@@ -13,3 +13,14 @@ main = do
 -- secondDemo f (a, b) = (a, f b)
 secondDemo :: (b -> c) -> (a, b) -> (a, c)
 secondDemo f = second f
+
+-- Other examples
+secondDemo2 :: (Integer, Integer)
+secondDemo2 = second (\ 1 -> 2) (1, 1)
+
+secondDemo3 :: (a, b) -> (a, Maybe b)
+secondDemo3 = second Just
+
+secondDemo4 :: Num b => (a, Maybe b) -> (a, Maybe b)
+secondDemo4 = second $ fmap (+1)
+
