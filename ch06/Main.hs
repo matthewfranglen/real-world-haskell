@@ -27,3 +27,13 @@ secondDemo3 = second Just
 secondDemo4 :: Num b => (a, Maybe b) -> (a, Maybe b)
 secondDemo4 = second $ fmap (+1)
 
+-- The `,` operator creates a tuple from two elements
+tupleDemo :: a -> b -> (a, b)
+tupleDemo a b = (,) a b
+-- can also be expressed as:
+-- tupleDemo = (,)
+-- which shouldn't really be surprising
+
+-- The `,,` operator creates a triple from three elements
+tripleDemo = a -> b -> c -> (a, b, c)
+tripleDemo a b c = (,,) a b c
