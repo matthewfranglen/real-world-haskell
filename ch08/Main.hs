@@ -21,11 +21,23 @@ closingPrice :: BS.ByteString -> Maybe Int
 closingPrice = readPrice . (!!4) . BS.split ','
 
 readPrice :: BS.ByteString -> Maybe Int
-readPrice str =
-    case BS.readInt str of
-      Nothing             -> Nothing
-      Just (dollars,rest) ->
-        case BS.readInt (BS.tail rest) of
-          Nothing           -> Nothing
-          Just (cents,more) ->
-            Just (dollars * 100 + cents)
+readPrice str = BS.readInt str >>= readFraction
+    where readFraction :: (Int, BS.ByteString) -> Maybe Int
+          readFraction (dollars, rest) = readTailInt rest >>= Just . (+dollarsInCents) . fst
+              where dollarsInCents = dollars * 100
+                    readTailInt = BS.readInt . BS.tail
+
+-- readPrice str = BS.readInt str >>= readFraction
+--     where readFraction :: (Int, BS.ByteString) -> Maybe Int
+--           readFraction (dollars, rest) = BS.readInt rest >>= Just . (+dollarsInCents) . fst
+--               where dollarsInCents = dollars * 100
+
+-- readPrice :: BS.ByteString -> Maybe Int
+-- readPrice str =
+--     case BS.readInt str of
+--       Nothing             -> Nothing
+--       Just (dollars,rest) ->
+--         case BS.readInt (BS.tail rest) of
+--           Nothing           -> Nothing
+--           Just (cents,more) ->
+--             Just (dollars * 100 + cents)
