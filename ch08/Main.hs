@@ -11,3 +11,16 @@ isElfFile path = hasElfMagic <$> BS.readFile path
 hasElfMagic :: BS.ByteString -> Bool
 hasElfMagic content = BS.take 4 content == elfMagic
     where elfMagic = BS.pack [0x7f, 0x45, 0x4c, 0x46]
+
+closingPrice :: BS.ByteString -> Maybe Int
+closingPrice = readPrice . (!!4) . BS.split ','
+
+readPrice :: BS.ByteString -> Maybe Int
+readPrice str =
+    case L.readInt str of
+      Nothing             -> Nothing
+      Just (dollars,rest) ->
+        case L.readInt (L.tail rest) of
+          Nothing           -> Nothing
+          Just (cents,more) ->
+            Just (dollars * 100 + cents)
