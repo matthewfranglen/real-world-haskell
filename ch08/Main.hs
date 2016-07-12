@@ -1,9 +1,11 @@
 import qualified Data.ByteString.Lazy.Char8 as BS
-import qualified Data.ByteString.Lazy
+import Data.Char (chr)
 
 -- main = isElfFile "./Main.hs" >>= putStrLn . show
 -- main = putStrLn . show =<< isElfFile "/bin/bash"
-main = putStrLn . show . readPrice =<< BS.readFile "./prices.csv"
+main =
+    BS.readFile "./prices.csv" >>=
+    putStrLn . show . closingPrice . (!!1) . BS.lines
 
 isElfFile :: FilePath -> IO Bool
 -- isElfFile path = BS.readFile path >>= return . hasElfMagic
@@ -12,7 +14,7 @@ isElfFile path = hasElfMagic <$> BS.readFile path
 
 hasElfMagic :: BS.ByteString -> Bool
 hasElfMagic content = BS.take 4 content == elfMagic
-    where elfMagic = Data.ByteString.Lazy.pack [0x7f, 0x45, 0x4c, 0x46]
+    where elfMagic = BS.pack $ map chr [0x7f, 0x45, 0x4c, 0x46]
 
 closingPrice :: BS.ByteString -> Maybe Int
 closingPrice = readPrice . (!!4) . BS.split ','
