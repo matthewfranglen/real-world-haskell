@@ -1,11 +1,12 @@
+module Lib
+    (
+        isElfFile,
+        closingPrice,
+        highestClose
+    ) where
+
 import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.Char (chr)
-
--- main = isElfFile "./Main.hs" >>= putStrLn . show
--- main = putStrLn . show =<< isElfFile "/bin/bash"
-main =
-    BS.readFile "./prices.csv" >>=
-    putStrLn . show . highestClose
 
 isElfFile :: FilePath -> IO Bool
 -- isElfFile path = BS.readFile path >>= return . hasElfMagic
