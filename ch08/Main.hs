@@ -1,6 +1,7 @@
 import qualified Data.ByteString.Lazy as BS
 
-main = show <$> isElfFile "./Main.hs" >>= putStrLn
+-- main = show <$> isElfFile "./Main.hs" >>= putStrLn
+main = show <$> isElfFile "/bin/bash" >>= putStrLn
 
 isElfFile :: FilePath -> IO Bool
 -- isElfFile path = BS.readFile path >>= return . hasElfMagic
