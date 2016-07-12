@@ -23,9 +23,8 @@ closingPrice = readPrice . (!!4) . BS.split ','
 readPrice :: BS.ByteString -> Maybe Int
 readPrice str = BS.readInt str >>= readFraction
     where readFraction :: (Int, BS.ByteString) -> Maybe Int
-          readFraction (dollars, rest) = readTailInt rest >>= Just . (+dollarsInCents) . fst
+          readFraction (dollars, rest) = (+dollarsInCents) <$> fst <$> BS.readInt (BS.tail rest)
               where dollarsInCents = dollars * 100
-                    readTailInt = BS.readInt . BS.tail
 
 -- readPrice str = BS.readInt str >>= readFraction
 --     where readFraction :: (Int, BS.ByteString) -> Maybe Int
