@@ -5,7 +5,8 @@ import Data.Char (chr)
 -- main = putStrLn . show =<< isElfFile "/bin/bash"
 main =
     BS.readFile "./prices.csv" >>=
-    putStrLn . show . closingPrice . (!!1) . BS.lines
+    return . (!!1) . BS.lines  >>=
+    putStrLn . show . closingPrice
 
 isElfFile :: FilePath -> IO Bool
 -- isElfFile path = BS.readFile path >>= return . hasElfMagic
