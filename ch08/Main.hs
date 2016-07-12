@@ -5,8 +5,7 @@ import Data.Char (chr)
 -- main = putStrLn . show =<< isElfFile "/bin/bash"
 main =
     BS.readFile "./prices.csv" >>=
-    return . (!!1) . BS.lines  >>=
-    putStrLn . show . closingPrice
+    putStrLn . show . highestClose
 
 isElfFile :: FilePath -> IO Bool
 -- isElfFile path = BS.readFile path >>= return . hasElfMagic
@@ -16,6 +15,9 @@ isElfFile path = hasElfMagic <$> BS.readFile path
 hasElfMagic :: BS.ByteString -> Bool
 hasElfMagic content = BS.take 4 content == elfMagic
     where elfMagic = BS.pack $ map chr [0x7f, 0x45, 0x4c, 0x46]
+
+highestClose :: BS.ByteString -> Maybe Int
+highestClose = maximum . (Nothing :) . map closingPrice . BS.lines
 
 closingPrice :: BS.ByteString -> Maybe Int
 closingPrice = readPrice . (!!4) . BS.split ','
