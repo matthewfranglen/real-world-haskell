@@ -15,6 +15,9 @@ globToRegex cs xs = f . ('^':) . (++"$") <$> globToRegex' xs
     where f | cs        = makeRegexOpts caseSensitive defaultExecOpt
             | otherwise = makeRegexOpts caseInsensitive defaultExecOpt
 
+caseSensitive = defaultCompOpt
+caseInsensitive = defaultCompOpt .|. compCaseless
+
 globToRegex' :: String -> Either String String
 globToRegex' "" = Right ""
 
@@ -37,6 +40,3 @@ charClass :: String -> Either String String
 charClass (']':cs) = (']':) <$> globToRegex' cs
 charClass (c:cs)   = (c:) <$> charClass cs
 charClass []       = Left "unterminated character class"
-
-caseSensitive = defaultCompOpt
-caseInsensitive = defaultCompOpt .|. compCaseless
