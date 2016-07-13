@@ -12,9 +12,8 @@ matchesGlob cs pattern name = (`matchTest` name) <$> globToRegex cs pattern
 
 globToRegex :: Bool -> String -> Either String Regex
 globToRegex cs xs = f . ('^':) . (++"$") <$> globToRegex' xs
-    where f = if cs
-              then makeRegexOpts caseSensitive defaultExecOpt
-              else makeRegexOpts caseInsensitive defaultExecOpt
+    where f   = makeRegexOpts cs' defaultExecOpt
+          cs' = if cs then caseSensitive else caseInsensitive
 
 caseSensitive = defaultCompOpt
 caseInsensitive = defaultCompOpt .|. compCaseless
