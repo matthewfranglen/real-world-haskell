@@ -20,7 +20,7 @@ library
                      , Regexy
   build-depends:       base >= 4.7 && < 5
                      , bytestring
-                     , regex-posix
+                     , regex-pcre
   default-language:    Haskell2010
 
 executable simple-exe
@@ -30,7 +30,7 @@ executable simple-exe
   build-depends:       base
                      , simple
                      , bytestring
-                     , regex-posix
+                     , regex-pcre
   default-language:    Haskell2010
 
 test-suite simple-test

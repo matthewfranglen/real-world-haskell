@@ -4,7 +4,7 @@ module Regexy
       , globToRegex
     ) where
 
-import Text.Regex.Posix
+import Text.Regex.PCRE
 import Data.Bits
 
 matchesGlob :: Bool -> FilePath -> String -> Either String Bool
