@@ -1,13 +1,13 @@
 module Regexy
     (
-        fileNameMatches
+        matchesGlob
       , globToRegex
     ) where
 
 import Text.Regex.Posix
 
-fileNameMatches :: String -> String -> Either String Bool
-fileNameMatches pattern name = (name =~) <$> globToRegex pattern
+matchesGlob :: FilePath -> String -> Either String Bool
+matchesGlob pattern name = (name =~) <$> globToRegex pattern
 
 globToRegex :: String -> Either String String
 globToRegex cs = ('^':) . (++"$") <$> globToRegex' cs
