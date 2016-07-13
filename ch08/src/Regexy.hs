@@ -1,31 +1,32 @@
 module Regexy
     (
+        globToRegex
     ) where
 
 import Text.Regex.Posix
 
-globToRegex :: String -> String
-globToRegex cs = '^' : globToRegex' cs ++ "$"
+globToRegex :: String -> Maybe String
+globToRegex cs = ('^':) . (++"$") <$> globToRegex' cs
 
-globToRegex' :: String -> String
-globToRegex' "" = ""
+globToRegex' :: String -> Maybe String
+globToRegex' "" = Just ""
 
-globToRegex' ('*':cs) = ".*" ++ globToRegex' cs
+globToRegex' ('*':cs) = (".*"++) <$> globToRegex' cs
 
-globToRegex' ('?':cs) = '.' : globToRegex' cs
+globToRegex' ('?':cs) = ('.':) <$> globToRegex' cs
 
-globToRegex' ('[':'!':c:cs) = "[^" ++ c : charClass cs
-globToRegex' ('[':c:cs)     = '['  :  c : charClass cs
-globToRegex' ('[':_)        = error "unterminated character class"
+globToRegex' ('[':'!':c:cs) = ("[^"++) . (c:) <$> charClass cs
+globToRegex' ('[':c:cs)     = ('[':) . (c:) <$> charClass cs
+globToRegex' ('[':_)        = Nothing -- unterminated character class
 
-globToRegex' (c:cs) = escape c ++ globToRegex' cs
+globToRegex' (c:cs) = ((escape c)++) <$> globToRegex' cs
 
 escape :: Char -> String
 escape c | c `elem` regexChars = '\\' : [c]
          | otherwise = [c]
     where regexChars = "\\+()^$.{}]|"
 
-charClass :: String -> String
-charClass (']':cs) = ']' : globToRegex' cs
-charClass (c:cs)   = c : charClass cs
-charClass []       = error "unterminated character class"
+charClass :: String -> Maybe String
+charClass (']':cs) = (']':) <$> globToRegex' cs
+charClass (c:cs)   = (c:) <$> charClass cs
+charClass []       = Nothing -- unterminated character class
