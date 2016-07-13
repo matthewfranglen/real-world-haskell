@@ -12,4 +12,4 @@ isElfFile path = hasElfMagic <$> BS.readFile path
 
 hasElfMagic :: BS.ByteString -> Bool
 hasElfMagic content = BS.take 4 content == elfMagic
-    where elfMagic = BS.pack $ map chr [0x7f, 0x45, 0x4c, 0x46]
+    where elfMagic = BS.pack [0x7f, 0x45, 0x4c, 0x46]
