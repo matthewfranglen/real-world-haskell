@@ -5,12 +5,15 @@ module Regexy
     ) where
 
 import Text.Regex.Posix
+import Data.Bits
 
-matchesGlob :: FilePath -> String -> Either String Bool
-matchesGlob pattern name = (name =~) <$> globToRegex pattern
+matchesGlob :: Bool -> FilePath -> String -> Either String Bool
+matchesGlob cs pattern name = (name =~) <$> globToRegex cs pattern
 
-globToRegex :: String -> Either String String
-globToRegex cs = ('^':) . (++"$") <$> globToRegex' cs
+globToRegex :: Bool -> String -> Either String Regex
+globToRegex cs xs = options . ('^':) . (++"$") <$> globToRegex' xs
+    where options | cs        = caseSensitive
+                  | otherwise = caseInsensitive
 
 globToRegex' :: String -> Either String String
 globToRegex' "" = Right ""
@@ -34,3 +37,6 @@ charClass :: String -> Either String String
 charClass (']':cs) = (']':) <$> globToRegex' cs
 charClass (c:cs)   = (c:) <$> charClass cs
 charClass []       = Left "unterminated character class"
+
+caseSensitive = makeRegexOpts defaultCompOpt defaultExecOpt
+caseInsensitive = makeRegexOpts (defaultCompOpt .|. compIgnoreCase) defaultExecOpt
