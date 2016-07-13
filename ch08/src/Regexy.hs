@@ -6,14 +6,14 @@ module Regexy
 
 import Text.Regex.Posix
 
-fileNameMatches :: String -> String -> Maybe Bool
+fileNameMatches :: String -> String -> Either String Bool
 fileNameMatches pattern name = (name =~) <$> globToRegex pattern
 
-globToRegex :: String -> Maybe String
+globToRegex :: String -> Either String String
 globToRegex cs = ('^':) . (++"$") <$> globToRegex' cs
 
-globToRegex' :: String -> Maybe String
-globToRegex' "" = Just ""
+globToRegex' :: String -> Either String String
+globToRegex' "" = Right ""
 
 globToRegex' ('*':cs) = (".*"++) <$> globToRegex' cs
 
@@ -21,7 +21,7 @@ globToRegex' ('?':cs) = ('.':) <$> globToRegex' cs
 
 globToRegex' ('[':'!':c:cs) = ("[^"++) . (c:) <$> charClass cs
 globToRegex' ('[':c:cs)     = ('[':) . (c:) <$> charClass cs
-globToRegex' ('[':_)        = Nothing -- unterminated character class
+globToRegex' ('[':_)        = Left "unterminated character class"
 
 globToRegex' (c:cs) = ((escape c)++) <$> globToRegex' cs
 
@@ -30,7 +30,7 @@ escape c | c `elem` regexChars = '\\' : [c]
          | otherwise = [c]
     where regexChars = "\\+()^$.{}]|"
 
-charClass :: String -> Maybe String
+charClass :: String -> Either String String
 charClass (']':cs) = (']':) <$> globToRegex' cs
 charClass (c:cs)   = (c:) <$> charClass cs
-charClass []       = Nothing -- unterminated character class
+charClass []       = Left "unterminated character class"
