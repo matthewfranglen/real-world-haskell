@@ -60,8 +60,5 @@ getBytes n str = let count            = fromIntegral n
                     then Nothing
                     else Just both
 
-simpleParse :: ParseState -> (a, ParseState)
-simpleParse = undefined
-
-betterParse :: ParseState -> Either String (a, ParseState)
-betterParse = undefined
+identity :: a -> Parse a
+identity a = Parse (\s -> Right (a, s))
