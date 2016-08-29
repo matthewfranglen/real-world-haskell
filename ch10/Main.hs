@@ -2,6 +2,7 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Lazy as L
 import Data.Char (isSpace)
 import Data.Int (Int64)
+import Data.Word (Word8)
 
 data Greymap = Greymap {
       greyWidth :: Int
@@ -70,3 +71,16 @@ parse parser initState =
 modifyOffset :: ParseState -> Int64 -> ParseState
 modifyOffset initState newOffset =
     initState { offset = newOffset }
+
+parseByte :: Parse Word8
+parseByte =
+    getState ==> \initState ->
+    case L.uncons (string initState) of
+      Nothing ->
+          bail "no more input"
+      Just (byte,remainder) ->
+          putState newState ==> \_ ->
+          identity byte
+        where newState = initState { string = remainder,
+                                     offset = newOffset }
+              newOffset = offset initState + 1
