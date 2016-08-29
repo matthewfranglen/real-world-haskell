@@ -10,13 +10,17 @@ data Greymap = Greymap {
     , greyData :: L.ByteString
     } deriving (Eq)
 
+instance Show Greymap where
+    show (Greymap w h m _) = "Greymap " ++ show w ++ "x" ++ show h ++ " " ++ show m
+
 data ParseState = ParseState {
       string :: L.ByteString
     , offset :: Int64
     } deriving (Show)
 
-instance Show Greymap where
-    show (Greymap w h m _) = "Greymap " ++ show w ++ "x" ++ show h ++ " " ++ show m
+newtype Parse a = Parse {
+      runParse :: ParseState -> Either String (a, ParseState)
+    }
 
 parseP5 :: L.ByteString -> Maybe (Greymap, L.ByteString)
 parseP5 s =
@@ -55,3 +59,9 @@ getBytes n str = let count            = fromIntegral n
                  in if L.length prefix < count
                     then Nothing
                     else Just both
+
+simpleParse :: ParseState -> (a, ParseState)
+simpleParse = undefined
+
+betterParse :: ParseState -> Either String (a, ParseState)
+betterParse = undefined
