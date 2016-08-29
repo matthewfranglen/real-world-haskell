@@ -66,3 +66,7 @@ identity a = Parse (\s -> Right (a, s))
 parse :: Parse a -> L.ByteString -> Either String a
 parse parser initState =
   runParse parser (ParseState initState 0) >>= (Right . fst)
+
+modifyOffset :: ParseState -> Int64 -> ParseState
+modifyOffset initState newOffset =
+    initState { offset = newOffset }
