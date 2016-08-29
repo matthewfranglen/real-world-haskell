@@ -47,13 +47,13 @@ matchHeader prefix str
 getNat :: L.ByteString -> Maybe (Int, L.ByteString)
 getNat s = case L8.readInt s of
              Nothing -> Nothing
-             Just (num,rest)
-                 | num <= 0    -> Nothing
+             Just (num, rest)
+                 | num <= 0  -> Nothing
                  | otherwise -> Just (fromIntegral num, rest)
 
 getBytes :: Int -> L.ByteString -> Maybe (L.ByteString, L.ByteString)
-getBytes n str = let count           = fromIntegral n
-                     both@(prefix,_) = L.splitAt count str
+getBytes n str = let count            = fromIntegral n
+                     both@(prefix, _) = L.splitAt count str
                  in if L.length prefix < count
                     then Nothing
                     else Just both
