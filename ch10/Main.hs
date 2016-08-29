@@ -64,7 +64,5 @@ identity :: a -> Parse a
 identity a = Parse (\s -> Right (a, s))
 
 parse :: Parse a -> L.ByteString -> Either String a
-parse parser initState
-    = case runParse parser (ParseState initState 0) of
-        Left err          -> Left err
-        Right (result, _) -> Right result
+parse parser initState =
+  runParse parser (ParseState initState 0) >>= (Right . fst)
