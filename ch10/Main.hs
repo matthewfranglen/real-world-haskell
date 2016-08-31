@@ -94,3 +94,13 @@ putState s = Parse (\_ -> Right ((), s))
 bail :: String -> Parse a
 bail err = Parse $ \s -> Left $
            "byte offset " ++ show (offset s) ++ ": " ++ err
+
+(==>) :: Parse a -> (a -> Parse b) -> Parse b
+
+firstParser ==> secondParser  =  Parse chainedParser
+  where chainedParser initState   =
+          case runParse firstParser initState of
+            Left errMessage ->
+                Left errMessage
+            Right (firstResult, newState) ->
+                runParse (secondParser firstResult) newState
