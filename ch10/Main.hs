@@ -115,3 +115,6 @@ w2c = chr . fromIntegral
 
 parseChar :: Parse Char
 parseChar = w2c <$> parseByte
+
+peekByte :: Parse (Maybe Word8)
+peekByte = (fmap fst . L.uncons . string) <$> getState
