@@ -121,3 +121,10 @@ peekByte = (fmap fst . L.uncons . string) <$> getState
 
 peekChar :: Parse (Maybe Char)
 peekChar = fmap w2c <$> peekByte
+
+parseWhile :: (Word8 -> Bool) -> Parse [Word8]
+parseWhile p = (fmap p <$> peekByte) ==> \mp ->
+               if mp == Just True
+               then parseByte ==> \b ->
+                    (b:) <$> parseWhile p
+               else identity []
