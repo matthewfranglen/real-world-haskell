@@ -104,3 +104,7 @@ firstParser ==> secondParser  =  Parse chainedParser
                 Left errMessage
             Right (firstResult, newState) ->
                 runParse (secondParser firstResult) newState
+
+instance Functor Parse where
+    fmap f parser = parser ==> \result ->
+                    identity (f result)
