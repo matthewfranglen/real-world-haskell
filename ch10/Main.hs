@@ -84,3 +84,9 @@ parseByte =
         where newState = initState { string = remainder,
                                      offset = newOffset }
               newOffset = offset initState + 1
+
+getState :: Parse ParseState
+getState = Parse (\s -> Right (s, s))
+
+putState :: ParseState -> Parse ()
+putState s = Parse (\_ -> Right ((), s))
