@@ -1,8 +1,9 @@
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Lazy as L
-import Data.Char (isSpace)
+import Data.Char (chr, isSpace)
 import Data.Int (Int64)
 import Data.Word (Word8)
+import Control.Applicative ((<$>))
 
 data Greymap = Greymap {
       greyWidth :: Int
@@ -108,3 +109,9 @@ firstParser ==> secondParser  =  Parse chainedParser
 instance Functor Parse where
     fmap f parser = parser ==> \result ->
                     identity (f result)
+
+w2c :: Word8 -> Char
+w2c = chr . fromIntegral
+
+parseChar :: Parse Char
+parseChar = w2c <$> parseByte
